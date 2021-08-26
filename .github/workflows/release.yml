@@ -12,36 +12,35 @@ jobs:
         arch: ["x86", "x64"]
 
     steps:
-      - uses: actions/checkout@v2
-
-      - uses: actions/checkout@v2
+      - name: Checkout lupa
+        uses: actions/checkout@v2
         with:
-          repo: "scoder/lupa"
+          repository: "scoder/lupa"
           path: "lupa"
 
-      - uses: actions/setup-python@v2
+      - name: Setup Python ${{ matrix.python }}
+        uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python }}
           architecture: ${{ matrix.arch }}
 
-      - uses: ilammy/msvc-dev-cmd@v1
+      - name: Setup msvc ${{ matrix.arch }}
+        uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: ${{ matrix.arch }}
 
-      - name: Build Luajit
+      - name: Build LuaJIT
         run: |
           Invoke-WebRequest http://luajit.org/download/LuaJIT-2.1.0-beta3.tar.gz -OutFile luajit.tar.gz
           tar -xvzf luajit.tar.gz
           cd LuaJIT-2.1.0-beta3/src
           ./msvcbuild.bat
 
-      - name: Build Wheel
+      - name: Build lupa wheel
         run: |
           cd lupa
-          python setup.py bdist_wheel --lua-includes ../lua/src --lua-lib ../lua/src/lua51.lib
-
-      - name: Generate Release Message
-        run: python gen_msg.py ${{ matrix.python }} ${{ matrix.arch }}
+          dir
+          python setup.py bdist_wheel --lua-includes ../LuaJIT-2.1.0-beta3/src --lua-lib ../LuaJIT-2.1.0-beta3/src/lua51.lib
 
       - name: Release
         uses: ncipollo/release-action@v1
