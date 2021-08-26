@@ -12,6 +12,8 @@ jobs:
         arch: ["x86"]
 
     steps:
+      - uses: actions/checkout@v2
+
       - name: Checkout lupa
         uses: actions/checkout@v2
         with:
@@ -36,11 +38,21 @@ jobs:
           cd LuaJIT-2.1.0-beta3/src
           ./msvcbuild.bat
 
+      - name: Prepare python
+        run: |
+          pip install -U pip
+          pip install -U Cython setuptools wheel
+
+      - name: Test lupa
+        run: |
+          cd lupa
+          python setup.py install --lua-includes ../LuaJIT-2.1.0-beta3/src --lua-lib ../LuaJIT-2.1.0-beta3/src/lua51.lib
+          cd ..
+          python test.py ${{ matrix.arch }}
+
       - name: Build lupa wheel
         run: |
           cd lupa
-          pip install -U pip
-          pip install -U Cython setuptools wheel
           python setup.py bdist_wheel --lua-includes ../LuaJIT-2.1.0-beta3/src --lua-lib ../LuaJIT-2.1.0-beta3/src/lua51.lib
 
       - name: Release
