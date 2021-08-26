@@ -1,0 +1,53 @@
+name: Releases
+
+on:
+  push:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        python: ["3.7", "3.8", "3.9"]
+        arch: ["x86", "x64"]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/checkout@v2
+        with:
+          repo: "scoder/lupa"
+          path: "lupa"
+
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+          architecture: ${{ matrix.arch }}
+
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.arch }}
+
+      - name: Build Luajit
+        run: |
+          Invoke-WebRequest http://luajit.org/download/LuaJIT-2.1.0-beta3.tar.gz -OutFile luajit.tar.gz
+          tar -xvzf luajit.tar.gz
+          cd LuaJIT-2.1.0-beta3/src
+          ./msvcbuild.bat
+
+      - name: Build Wheel
+        run: |
+          cd lupa
+          python setup.py bdist_wheel --lua-includes ../lua/src --lua-lib ../lua/src/${{ lua }}.lib
+
+      - name: Generate Release Message
+        run: python gen_msg.py ${{ matrix.python }} ${{ matrix.arch }}
+
+      - name: Release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ matrix.python }}-${{ matrix.arch }}
+          commit: main
+          artifacts: "lupa/dist/*"
+          body: "Build with: python${{ matrix.python }}, ${{ matrix.arch }}"
+          token: ${{ secrets.GITHUB_TOKEN }}
