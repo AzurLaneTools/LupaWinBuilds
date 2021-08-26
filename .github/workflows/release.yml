@@ -8,8 +8,8 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        python: ["3.9"]
-        arch: ["x86"]
+        python: ["3.7", "3.8", "3.9"]
+        arch: ["x86", "x64"]
 
     steps:
       - uses: actions/checkout@v2
@@ -58,6 +58,7 @@ jobs:
       - name: Release
         uses: ncipollo/release-action@v1
         with:
+          allowUpdates: true
           tag: ${{ matrix.python }}-${{ matrix.arch }}
           commit: main
           artifacts: "lupa/dist/*"
