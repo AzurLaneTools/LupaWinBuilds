@@ -27,13 +27,12 @@ jobs:
 
       - name: Setup msvc ${{ matrix.arch }}
         uses: ilammy/msvc-dev-cmd@v1
-        with:
-          arch: ${{ matrix.arch }}
 
       - name: Build LuaJIT
         run: |
           Invoke-WebRequest http://luajit.org/download/LuaJIT-2.1.0-beta3.tar.gz -OutFile luajit.tar.gz
           tar -xvzf luajit.tar.gz
+          python update_target.py ${{ matrix.arch }}
           cd LuaJIT-2.1.0-beta3/src
           ./msvcbuild.bat
 
