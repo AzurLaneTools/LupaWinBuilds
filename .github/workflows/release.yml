@@ -39,7 +39,8 @@ jobs:
       - name: Build lupa wheel
         run: |
           cd lupa
-          dir
+          pip install -U pip
+          pip install -U Cython setuptools
           python setup.py bdist_wheel --lua-includes ../LuaJIT-2.1.0-beta3/src --lua-lib ../LuaJIT-2.1.0-beta3/src/lua51.lib
 
       - name: Release
