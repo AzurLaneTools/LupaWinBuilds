@@ -38,7 +38,7 @@ jobs:
       - name: Build Wheel
         run: |
           cd lupa
-          python setup.py bdist_wheel --lua-includes ../lua/src --lua-lib ../lua/src/${{ lua }}.lib
+          python setup.py bdist_wheel --lua-includes ../lua/src --lua-lib ../lua/src/lua51.lib
 
       - name: Generate Release Message
         run: python gen_msg.py ${{ matrix.python }} ${{ matrix.arch }}
